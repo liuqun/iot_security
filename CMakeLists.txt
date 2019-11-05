@@ -11,12 +11,8 @@ include(CheckIncludeFiles)
 include(CheckFunctionExists)
 include(CheckLibraryExists)
 include(CheckSymbolExists)
-include(GNUInstallDirs)
 
 if(ENABLE_TLS)
-    set(CMAKE_INSTALL_NAME_DIR ${CMAKE_INSTALL_FULL_LIBDIR}/hiawatha)
-    set(LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/hiawatha)
-
     # Check for mbedTLS
     if(USE_SYSTEM_MBEDTLS)
         message(WARNING "Make sure the mbed TLS shared library has been built with the MBEDTLS_THREADING_PTHREAD and MBEDTLS_THREADING_C flags set. Otherwise, it may crash the Hiawatha webserver.")
@@ -57,13 +53,17 @@ if(ENABLE_TLS)
 endif(ENABLE_TLS)
 
 # Where to install libs and exe programs
-set(CMAKE_INSTALL_NAME_DIR ${CMAKE_INSTALL_FULL_LIBDIR}/hiawatha)
-set(LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/hiawatha)
-if (APPLE)
-    set(CMAKE_MACOSX_RPATH ${CMAKE_MACOSX_RPATH};${CMAKE_INSTALL_FULL_LIBDIR}/hiawatha)
-endif()
-if(NOT USE_SYSTEM_MBEDTLS)
-    set_target_properties(main PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR}/hiawatha)
-endif()
+include(GNUInstallDirs)
+if(ENABLE_TLS)
+    set(CMAKE_INSTALL_NAME_DIR ${CMAKE_INSTALL_FULL_LIBDIR}/hiawatha)
+    set(LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/hiawatha)
+    if (APPLE)
+        set(CMAKE_MACOSX_RPATH ${CMAKE_MACOSX_RPATH};${CMAKE_INSTALL_FULL_LIBDIR}/hiawatha)
+    endif()
+    if(NOT USE_SYSTEM_MBEDTLS)
+        set_target_properties(main PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR}/hiawatha)
+    endif()
+endif(ENABLE_TLS)
+
 # Installation
 install(TARGETS main DESTINATION ${CMAKE_INSTALL_BINDIR})
